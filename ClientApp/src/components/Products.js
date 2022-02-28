@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Table, Form, FormGroup, Label, Input, Button } from 'reactstrap';
+import { Table, Button } from 'reactstrap';
 import moment from 'moment';
-
-import useForm from '../hooks/useForm';
+import ProductForm from './ProductForm';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  
   const [loading, setLoading] = useState(false);
+
+  
+
   const numberFormat = useMemo(() => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }));
 
   useEffect(() => {
@@ -43,11 +45,10 @@ export default function Products() {
       const newProduct = await createdProduct.json();
       console.log({newProduct})
       setProducts(state => ([...state, newProduct]))
-      reset();
-      return
+      return true
     }
 
-    reset();
+    return false
   }, [])
 
   const DeleteProduct = useCallback(async (id) => {
@@ -62,15 +63,7 @@ export default function Products() {
     }
   }, [])
 
-  const [form, handleChange, reset] = useForm({
-    precio: '', 
-    categoria: 0,
-  });
-
-  const handleSumbit = (e) => {
-    e.preventDefault();
-    CreateProduct(form);
-  } 
+  const submit = async (form) => await CreateProduct(form);
   
   return (
     <div>
@@ -120,60 +113,9 @@ export default function Products() {
             }
           </tbody>
         </Table>
-        <Form onSubmit={handleSumbit} className="order-1 order-md-2 col-12 col-md-4 p-4 border" style={{ }}>
-          <FormGroup>
-            <Label for="precio">Precio</Label>
-            <Input
-              required
-              id="precio"
-              name="precio"
-              type="number"
-              value={form.precio}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </FormGroup>
-          <FormGroup tag="fieldset">
-            <legend>
-              Categoría
-            </legend>
-            <FormGroup check>
-              <Input
-                required
-                id="produno"
-                name="categoria"
-                type="radio"
-                value="1"
-                onChange={handleChange}
-                checked={form.categoria === "1"}
-                disabled={loading}
-              />
-              {' '}
-              <Label for="produno">
-                PRODUNO
-              </Label>
-            </FormGroup>
-            <FormGroup check>
-              <Input
-                required
-                id="proddos"
-                name="categoria"
-                type="radio"
-                value="2"
-                onChange={handleChange}
-                checked={form.categoria === "2"}
-                disabled={loading}
-              />
-              {' '}
-              <Label for="proddos">
-                PRODDOS
-              </Label>
-            </FormGroup>
-          </FormGroup>
-          <Button disabled={loading}>
-            Cargar Producto
-          </Button>
-        </Form>
+
+        <ProductForm submit={submit} loading={loading} />
+        
       </div>
     </div>
   );
