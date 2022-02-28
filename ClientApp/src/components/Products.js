@@ -4,15 +4,10 @@ import moment from 'moment';
 
 import useForm from '../hooks/useForm';
 
-const products = [
-  { id: 1, precio: 60, fechaCarga: '26/02/2022', categoria: 'PRODUNO' },
-  { id: 1, precio: 105, fechaCarga: '24/02/2022', categoria: 'PRODUNO' },
-]
-
 export default function Products() {
   const [products, setProducts] = useState([
-    { id: 1, precio: 60, fechaCarga: '26/02/2022', categoria: 'PRODUNO' },
-    { id: 2, precio: 105, fechaCarga: '24/02/2022', categoria: 'PRODUNO' },
+    { id: 1, precio: 60, fechaCarga: moment(), categoria: 'PRODUNO' },
+    { id: 2, precio: 105, fechaCarga: moment(), categoria: 'PRODUNO' },
   ])
 
   const [form, handleChange, reset] = useForm({
@@ -48,6 +43,7 @@ export default function Products() {
               <th>
                 Categoría
               </th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -61,10 +57,15 @@ export default function Products() {
                     {product.precio}
                   </td>
                   <td>
-                    {product.fechaCarga}
+                    {moment(product.fechaCarga).format('DD/MM/YYYY')}
                   </td>
                   <td>
                     {product.categoria}
+                  </td>
+                  <td>
+                    <Button color="danger">
+                      Eliminar
+                    </Button>
                   </td>
                 </tr>
               ))
@@ -90,6 +91,7 @@ export default function Products() {
             </legend>
             <FormGroup check>
               <Input
+                required
                 id="produno"
                 name="categoria"
                 type="radio"
@@ -104,6 +106,7 @@ export default function Products() {
             </FormGroup>
             <FormGroup check>
               <Input
+                required
                 id="proddos"
                 name="categoria"
                 type="radio"
