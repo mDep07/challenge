@@ -41,6 +41,13 @@ namespace GYF_Challenge.Controllers
             return productos;
         }
 
+        // GET: api/Productos/Categorias
+        [HttpGet("Categorias")]
+        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategorias()
+        {
+            return await _context.Categorias.ToListAsync();
+        }
+
         // GET: api/Productos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Producto>> GetProducto(int id)

@@ -6,6 +6,7 @@ import useForm from '../hooks/useForm';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const numberFormat = useMemo(() => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }));
 
@@ -19,7 +20,15 @@ export default function Products() {
       setLoading(false)
     }
 
+    const FetchCategorias = async () => {
+      //api/Productos/Categorias
+      const response = await fetch('api/Productos/Categorias');
+      const data = await response.json();
+      console.log({data})
+    }
+
     FetchProducts();
+    FetchCategorias();
   }, []);
 
   const CreateProduct = useCallback(async (product) => {
@@ -140,7 +149,7 @@ export default function Products() {
                 disabled={loading}
               />
               {' '}
-              <Label for="produno" check>
+              <Label for="produno">
                 PRODUNO
               </Label>
             </FormGroup>
@@ -156,7 +165,7 @@ export default function Products() {
                 disabled={loading}
               />
               {' '}
-              <Label for="proddos" check>
+              <Label for="proddos">
                 PRODDOS
               </Label>
             </FormGroup>
