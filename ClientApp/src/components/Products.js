@@ -22,15 +22,7 @@ export default function Products() {
       setLoading(false)
     }
 
-    const FetchCategorias = async () => {
-      //api/Productos/Categorias
-      const response = await fetch('api/Productos/Categorias');
-      const data = await response.json();
-      console.log({data})
-    }
-
     FetchProducts();
-    FetchCategorias();
   }, []);
 
   const CreateProduct = useCallback(async (product) => {
@@ -69,53 +61,55 @@ export default function Products() {
     <div>
       <h4>Productos</h4>
       <div className="row">
-        <Table className="order-2 order-md-1 col-12 col-md-8">
-          <thead>
-            <tr>
-              <th>
-                #
-              </th>
-              <th>
-                Precio
-              </th>
-              <th>
-                Fecha de Carga
-              </th>
-              <th>
-                Categoría
-              </th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              products.map(product => (
-                <tr key={product.id}>
-                  <th scope="row">
-                    {product.id}
+        <div className="order-2 order-md-1 col-12 col-md-8">
+          <Table>
+              <thead>
+                <tr>
+                  <th>
+                    #
                   </th>
-                  <td>
-                    {numberFormat.format(product.precio )}
-                  </td>
-                  <td>
-                    {moment(product.fechaCarga).format('DD/MM/YYYY')}
-                  </td>
-                  <td>
-                    {product.categoriaNavigation.nombre}
-                  </td>
-                  <td>
-                    <Button color="danger" onClick={() => DeleteProduct(product.id)}>
-                      Eliminar
-                    </Button>
-                  </td>
+                  <th>
+                    Precio
+                  </th>
+                  <th>
+                    Fecha de Carga
+                  </th>
+                  <th>
+                    Categoría
+                  </th>
+                  <th></th>
                 </tr>
-              ))
-            }
-          </tbody>
-        </Table>
-
-        <ProductForm submit={submit} loading={loading} />
-        
+              </thead>
+              <tbody>
+                {
+                  products.map(product => (
+                    <tr key={product.id}>
+                      <th scope="row">
+                        {product.id}
+                      </th>
+                      <td>
+                        {numberFormat.format(product.precio )}
+                      </td>
+                      <td>
+                        {moment(product.fechaCarga).format('DD/MM/YYYY')}
+                      </td>
+                      <td>
+                        {product.categoriaNavigation.nombre}
+                      </td>
+                      <td>
+                        <Button color="danger" onClick={() => DeleteProduct(product.id)}>
+                          Eliminar
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </Table>
+        </div>
+        <div className="order-1 order-md-2 col-12 col-md-4 p-4 border">
+          <ProductForm submit={submit} loading={loading} />
+        </div>
       </div>
     </div>
   );

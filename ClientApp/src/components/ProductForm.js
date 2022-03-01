@@ -3,7 +3,22 @@ import { Form, FormGroup, Label, Input, Button } from 'reactstrap';
 import useForm from '../hooks/useForm';
 
 export default function ProductForm({ submit, loading }) {
+  const [error, setError] = useState('');
   const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    console.log('asdasd');
+
+    const FetchCategorias = async () => {
+      //api/Productos/Categorias
+      const response = await fetch('api/Productos/Categorias');
+      const data = await response.json();
+      setCategories(data);
+    }
+
+    FetchCategorias();
+
+  },[])
 
   const [form, handleChange, reset] = useForm({
     precio: '', 
@@ -12,13 +27,26 @@ export default function ProductForm({ submit, loading }) {
 
   const handleSumbit = async (e) => {
     e.preventDefault();
+    if(form.precio <= 0) {
+      setError('El precio debe ser mayor a 0.')
+    } else if (form.categoria === 0) {
+      setError('Debe seleccionar una categoría.')
+    }
+
+    if(error) {
+      return
+    }
+
     const response = await submit(form);
     if(response)
       reset();
-  } 
+  }
 
   return (
-    <Form onSubmit={handleSumbit} className="order-1 order-md-2 col-12 col-md-4 p-4 border">
+    <Form onSubmit={handleSumbit}>
+      <h4 className="text-center">Agregar Producto</h4>
+      <hr />
+      { error && <small className="text-danger">{error}</small> }
       <FormGroup>
         <Label for="precio">Precio</Label>
         <Input
@@ -32,43 +60,29 @@ export default function ProductForm({ submit, loading }) {
         />
       </FormGroup>
       <FormGroup tag="fieldset">
-        <legend>
-          Categoría
-        </legend>
-        <FormGroup check>
-          <Input
-            required
-            id="produno"
-            name="categoria"
-            type="radio"
-            value="1"
-            onChange={handleChange}
-            checked={form.categoria === "1"}
-            disabled={loading}
-          />
-          {' '}
-          <Label for="produno">
-            PRODUNO
-          </Label>
-        </FormGroup>
-        <FormGroup check>
-          <Input
-            required
-            id="proddos"
-            name="categoria"
-            type="radio"
-            value="2"
-            onChange={handleChange}
-            checked={form.categoria === "2"}
-            disabled={loading}
-          />
-          {' '}
-          <Label for="proddos">
-            PRODDOS
-          </Label>
-        </FormGroup>
+        <Label>Categoría</Label>
+        {
+          categories.map(category => (
+            <FormGroup check key={category.id}>
+              <Input
+                // required
+                id={category.nombre}
+                name="categoria"
+                type="radio"
+                value={category.id}
+                onChange={handleChange}
+                checked={parseInt(form.categoria) === category.id}
+                disabled={loading}
+              />
+              {' '}
+              <Label for={category.nombre}>
+                {category.nombre}
+              </Label>
+            </FormGroup>
+          ))
+        }
       </FormGroup>
-      <Button disabled={loading}>
+      <Button disabled={loading} block>
         Cargar Producto
       </Button>
     </Form>
