@@ -60,7 +60,7 @@ export default function Products() {
   return (
     <div>
       <h4>Productos</h4>
-      <div className="row">
+      <div className="row align-items-start">
         <div className="order-2 order-md-1 col-12 col-md-8">
           <Table>
               <thead>
