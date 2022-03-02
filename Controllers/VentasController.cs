@@ -40,29 +40,27 @@ namespace GYF_Challenge.Controllers
       };
 
       var primerGrupo = productosAgrupados.ElementAtOrDefault(0);
-      if(primerGrupo == null)
-      {
-        return resultado;
-      }
-
       var segundoGrupo = productosAgrupados.ElementAtOrDefault(1);
-      if(segundoGrupo == null)
+      if(primerGrupo == null || segundoGrupo == null)
       {
-        
-        var primerResultado = primerGrupo.First();
-        var categoria = _context.Categorias.Find(primerResultado.Categoria);
-        primerResultado.CategoriaNavigation = new Categoria() 
-        {
-          Id = categoria.Id,
-          Nombre = categoria.Nombre
-        };
-
-        resultado.Productos.Add(primerResultado);
-        resultado.Suma = (decimal)primerResultado.Precio;
         return resultado;
       }
 
-      
+      // if(segundoGrupo == null)
+      // {
+      //   var primerResultado = primerGrupo.First();
+      //   var categoria = _context.Categorias.Find(primerResultado.Categoria);
+      //   primerResultado.CategoriaNavigation = new Categoria() 
+      //   {
+      //     Id = categoria.Id,
+      //     Nombre = categoria.Nombre
+      //   };
+
+      //   resultado.Productos.Add(primerResultado);
+      //   resultado.Suma = (decimal)primerResultado.Precio;
+      //   return resultado;
+      // }
+
       var listadoProductos = new List<List<Producto>>();
       for(var i = 0; i < primerGrupo.Count(); i++)
       {
@@ -75,6 +73,11 @@ namespace GYF_Challenge.Controllers
           listado.Add(existeProducto);
           listadoProductos.Add(listado);
         }
+      }
+
+      if(listadoProductos.Count() == 0) 
+      {
+        return resultado;
       }
 
       var listadoPosiblesVentas = listadoProductos.Aggregate(

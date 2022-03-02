@@ -10,11 +10,14 @@ export default function Home() {
   const [form, handleChange, reset] = useForm({ presupuesto: '' });
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch('api/Ventas?presupuesto=' + form.presupuesto);
-    console.log({response})
-    if(response.ok) {
-      const data = await response.json();
-      setVenta(data);
+    try {
+      const response = await fetch('api/Ventas?presupuesto=' + form.presupuesto);
+      if(response.ok) {
+        const data = await response.json();
+        setVenta(data);
+      }
+    } catch {
+      setVenta({ suma: 0, productos: [] });
     }
   }
   
