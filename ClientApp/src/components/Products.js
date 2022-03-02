@@ -3,14 +3,12 @@ import { Table, Button } from 'reactstrap';
 import moment from 'moment';
 import ProductForm from './ProductForm';
 
+import { numberFormat } from '../App'
+
 export default function Products() {
   const [products, setProducts] = useState([]);
   
   const [loading, setLoading] = useState(false);
-
-  
-
-  const numberFormat = useMemo(() => new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }));
 
   useEffect(() => {
     setLoading(true)

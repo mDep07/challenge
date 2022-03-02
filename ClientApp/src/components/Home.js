@@ -1,25 +1,60 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
+import { Form, FormGroup, Label, Input, Button, Card } from 'reactstrap';
+
+import useForm from '../hooks/useForm';
+import { numberFormat } from '../App';
 
 export default function Home() {
+  const [venta, setVenta] = useState({ suma: 0, productos: [] });
 
-  useEffect(() => {
-    const FetchVentas = async () => {
-      const response = await fetch('api/Ventas?presupuesto=130');
-      console.log({response})
-      if(response.ok) {
-        const data = await response.json();
-        console.log({data})
-
-      }
+  const [form, handleChange, reset] = useForm({ presupuesto: '' });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await fetch('api/Ventas?presupuesto=' + form.presupuesto);
+    console.log({response})
+    if(response.ok) {
+      const data = await response.json();
+      setVenta(data);
     }
-
-    FetchVentas();
-  },[])
+  }
   
   return (
     <div>
       <h4>Ventas</h4>
-      <p>Welcome to your new single-page application, built with:</p>
+      <div className="row">
+        <Form onSubmit={handleSubmit} className="col-12 col-sm-4"> 
+          <FormGroup>
+              <Label for="presupuesto">Presupuesto</Label>
+              <Input
+                required
+                id="presupuesto"
+                name="presupuesto"
+                type="number"
+                value={form.presupuesto}
+                onChange={handleChange}
+                max={1000000}
+                min={0}
+              />
+            </FormGroup>
+            <Button type="submit" block>
+              Buscar
+            </Button>
+         </Form>
+      </div>
+      <div className="row">
+        {
+          venta.suma > 0 &&
+          venta.productos.map(prod => (
+            <div key={prod.id} className="col-12 col-md-6 p-2">
+              <Card className="p-2">
+                <h5>#{prod.id}</h5>
+                <h2 className="mb-1">{numberFormat.format(prod.precio)}</h2>
+                <p className="m-0">Categoría: <strong>{prod.categoriaNavigation.nombre}</strong></p>
+              </Card>
+            </div>  
+          ))
+        }
+      </div>
     </div>
   );
 }

@@ -22,35 +22,48 @@ namespace GYF_Challenge.Controllers
 
     // GET: api/Ventas
     [HttpGet]
-    public async Task<ActionResult<Venta>> GetProductos(decimal presupuesto)
+    public async Task<ActionResult<Venta>> GetProductos(int presupuesto)
     {
-      var productos = await _context.Productos.Where(prod => prod.Precio < presupuesto).ToListAsync();
+      if(presupuesto < 0 || presupuesto > 1000000) 
+      {
+        return BadRequest();
+      }
+
+      var productos = await _context.Productos.Where(prod => prod.Precio <= presupuesto).ToListAsync();
       var productosOrdenados = productos.OrderByDescending(prod => prod.Precio).ToArray();
       var productosAgrupados = productosOrdenados.GroupBy(prod => prod.Categoria).ToArray();
 
+      var resultado = new Venta() 
+      {
+        Suma = 0,
+        Productos = new List<Producto>()
+      };
 
       var primerGrupo = productosAgrupados.ElementAtOrDefault(0);
       if(primerGrupo == null)
       {
-        return NoContent();
+        return resultado;
       }
 
       var segundoGrupo = productosAgrupados.ElementAtOrDefault(1);
       if(segundoGrupo == null)
       {
+        
         var primerResultado = primerGrupo.First();
-        var resultado = new Venta() 
+        var categoria = _context.Categorias.Find(primerResultado.Categoria);
+        primerResultado.CategoriaNavigation = new Categoria() 
         {
-          Suma = (decimal)primerResultado.Precio,
-          Productos = new List<Producto>()
+          Id = categoria.Id,
+          Nombre = categoria.Nombre
         };
 
         resultado.Productos.Add(primerResultado);
+        resultado.Suma = (decimal)primerResultado.Precio;
         return resultado;
       }
 
       
-      var resultado1 = new List<List<Producto>>();
+      var listadoProductos = new List<List<Producto>>();
       for(var i = 0; i < primerGrupo.Count(); i++)
       {
         var producto = primerGrupo.ElementAtOrDefault(i);
@@ -60,25 +73,11 @@ namespace GYF_Challenge.Controllers
           var listado = new List<Producto>();
           listado.Add(producto);
           listado.Add(existeProducto);
-          resultado1.Add(listado);
+          listadoProductos.Add(listado);
         }
-
-        // for(var j = 0; j <= segundoGrupo.Count(); j++)
-        // {
-        //   var productoSigGrupo = segundoGrupo.ElementAtOrDefault(j);
-        //   var sumaPrecios = producto.Precio + productoSigGrupo.Precio;
-        //   if(sumaPrecios <= presupuesto)
-        //   { 
-        //     var listado = new List<Producto>();
-        //     listado.Add(producto);
-        //     listado.Add(productoSigGrupo);
-        //     resultado1.Add(listado);
-        //     break;
-        //   }
-        // }
       }
 
-      var listadoPosiblesVentas = resultado1.Aggregate(
+      var listadoPosiblesVentas = listadoProductos.Aggregate(
         new List<Venta>(), (acc, current) => 
         {
           var venta = new Venta()
@@ -93,8 +92,6 @@ namespace GYF_Challenge.Controllers
         });
 
       var venta = listadoPosiblesVentas.OrderByDescending(venta => venta.Suma).First();
-      var categorias = await _context.Categorias.ToListAsync();
-
       venta.Productos.ForEach(prod => 
       {
         var categoria = _context.Categorias.Find(prod.Categoria);
@@ -105,7 +102,10 @@ namespace GYF_Challenge.Controllers
         };
       });
 
-      return venta;
+      resultado.Suma = venta.Suma;
+      resultado.Productos = venta.Productos;
+
+      return resultado;
     }
   }
 }
