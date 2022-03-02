@@ -4,14 +4,13 @@ export default function Home() {
 
   useEffect(() => {
     const FetchVentas = async () => {
-      const options = {
-        method: 'GET',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ presupuesto: 1000.5 })
+      const response = await fetch('api/Ventas?presupuesto=130');
+      console.log({response})
+      if(response.ok) {
+        const data = await response.json();
+        console.log({data})
+
       }
-      const response = await fetch('api/Ventas?presupuesto=1000.5');
-      const data = await response.json();
-      console.log({data})
     }
 
     FetchVentas();
